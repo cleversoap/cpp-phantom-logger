@@ -7,20 +7,27 @@
 	#define LOG_FUNCTION(...)
 #endif
 
-#define TRACE(fmt,...)		LOG_FUNCTION("TRACE",fmt,##__VA_ARGS__)
-#define DEBUG(fmt,...)		LOG_FUNCTION("DEBUG",fmt,##__VA_ARGS__)
-#define WARN(fmt,...)		LOG_FUNCTION("WARN",fmt,##__VA_ARGS__)
-#define ERROR(fmt,...)		LOG_FUNCTION("ERROR",fmt,##__VA_ARGS__)
-#define NET(fmt,...)		LOG_FUNCTION("NET",fmt,##__VA_ARGS__)
-#define IO(fmt,...)			LOG_FUNCTION("IO",fmt,##__VA_ARGS__)
+#define TRACE(fmt,...) LOG_FUNCTION("TRACE",fmt,##__VA_ARGS__)
+#define DEBUG(fmt,...) LOG_FUNCTION("DEBUG",fmt,##__VA_ARGS__)
+#define WARN(fmt,...)  LOG_FUNCTION("WARN",fmt,##__VA_ARGS__)
+#define ERROR(fmt,...) LOG_FUNCTION("ERROR",fmt,##__VA_ARGS__)
+#define NET(fmt,...)   LOG_FUNCTION("NET",fmt,##__VA_ARGS__)
+#define IO(fmt,...)    LOG_FUNCTION("IO",fmt,##__VA_ARGS__)
 
 #if defined(_LOG_PRINT_) || defined(_LOG_FILE_)
+
+#ifdef _LOG_FILE_
+	#define LFX(tok) #tok
+	#define LFS(tok) LFX(tok)
+	#define _LOG_FILE_STR_ LFS(_LOG_FILE_)
+#endif
 
 #include <string>
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
 #include <time.h>
+#include <fcntl.h>
 
 static inline char* currentTime()
 {
@@ -35,7 +42,7 @@ static inline char* currentTime()
 	return buffer;
 }
 
-static inline void phantomLog(char* tag, const char* format, ...)
+static inline void phantomLog(const char* tag, const char* format, ...)
 {
 	// Variable List
 	va_list argptr;
@@ -51,12 +58,11 @@ static inline void phantomLog(char* tag, const char* format, ...)
 #endif
 
 #ifdef _LOG_FILE_
-	/*
-	int fd = open(_LOG_FILE_, O_WRONLY);
-	pwrite(fd, write_buffer, sizeof(write_buffer));
+	static int fd = open(_LOG_FILE_STR_, O_WRONLY);
+	pwrite(fd, msg, sizeof(msg),0);
 	close(fd);
-	*/
 #endif
+	delete msg;
 }
 
 #endif
