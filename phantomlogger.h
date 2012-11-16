@@ -16,19 +16,9 @@
 
 #if defined(_LOG_PRINT_) || defined(_LOG_FILE_)
 
-#ifdef _LOG_FILE_
-	#define LFX(tok) #tok
-	#define LFS(tok) LFX(tok)
-	#define _LOG_FILE_STR_ LFS(_LOG_FILE_)
-#endif
-
-#include <string>
 #include <iostream>
-#include <stdio.h>
 #include <fstream>
 #include <time.h>
-#include <fcntl.h>
-
 static inline char* currentTime()
 {
 	static char buffer[19];
@@ -58,9 +48,13 @@ static inline void phantomLog(const char* tag, const char* format, ...)
 #endif
 
 #ifdef _LOG_FILE_
-	static int fd = open(_LOG_FILE_STR_, O_WRONLY);
-	pwrite(fd, msg, sizeof(msg),0);
-	close(fd);
+	#define LFX(tok) #tok
+	#define LFS(tok) LFX(tok)
+	#define _LOG_FILE_STR_ LFS(_LOG_FILE_)
+	std::ofstream lf;
+	lf.open(_LOG_FILE_STR_, std::ios::out | std::ios::app);
+	lf << msg << std::endl;
+	lf.close();
 #endif
 	delete msg;
 }
