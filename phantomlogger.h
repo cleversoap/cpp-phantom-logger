@@ -19,18 +19,6 @@
 #include <iostream>
 #include <fstream>
 #include <time.h>
-static inline char* currentTime()
-{
-	static char buffer[19];
-	time_t rawTime;
-	struct tm* timeInfo;
-
-	time(&rawTime);
-	timeInfo = localtime(&rawTime); // Should this be system time?
-
-	strftime(buffer, 19, "%Y-%m-%d %H:%M:%S", timeInfo);
-	return buffer;
-}
 
 static inline void phantomLog(const char* tag, const char* format, ...)
 {
@@ -43,8 +31,16 @@ static inline void phantomLog(const char* tag, const char* format, ...)
 	vasprintf(&msg, format, argptr);
 	va_end(argptr);
 	
+	// Time
+	static char timeBuffer[19];
+	time_t rawTime;
+	struct tm* timeInfo;
+	time(&rawTime);
+	timeInfo = localtime(&rawTime); // Should this be system time?
+	strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+	
 #ifdef _LOG_PRINT_
-	std::cout << currentTime() << "\t" << tag << "\t" << msg << std::endl;
+	std::cout << timeBuffer << "\t" << tag << "\t" << msg << std::endl;
 #endif
 
 #ifdef _LOG_FILE_
@@ -53,7 +49,7 @@ static inline void phantomLog(const char* tag, const char* format, ...)
 	#define _LOG_FILE_STR_ LFS(_LOG_FILE_)
 	std::ofstream lf;
 	lf.open(_LOG_FILE_STR_, std::ios::out | std::ios::app);
-	lf << currentTime() << "\t" << tag << "\t" << msg << std::endl;
+	lf << timeBuffer << "\t" << tag << "\t" << msg << std::endl;
 	lf.close();
 #endif
 	delete msg;
