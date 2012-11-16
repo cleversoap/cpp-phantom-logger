@@ -14,6 +14,8 @@
 #define NET(fmt,...)		LOG_FUNCTION("NET",fmt,##__VA_ARGS__)
 #define IO(fmt,...)			LOG_FUNCTION("IO",fmt,##__VA_ARGS__)
 
+#if defined(_LOG_PRINT_) || defined(_LOG_FILE_)
+
 #include <string>
 #include <iostream>
 #include <stdio.h>
@@ -40,8 +42,8 @@ static inline void phantomLog(char* tag, const char* format, ...)
 	va_start(argptr, format);
 
 	// Create log message
-	char msg[256];
-	vsnprintf(msg, sizeof(msg), format, argptr);
+	char* msg;
+	vasprintf(&msg, format, argptr);
 	va_end(argptr);
 	
 #ifdef _LOG_PRINT_
@@ -56,5 +58,7 @@ static inline void phantomLog(char* tag, const char* format, ...)
 	*/
 #endif
 }
+
+#endif
 
 #endif
