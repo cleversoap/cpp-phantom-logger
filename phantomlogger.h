@@ -41,6 +41,11 @@
 #include <fstream>
 #include <time.h>
 
+#ifdef _LOG_PRINT_
+#include <mutex>
+static std::mutex __log_mutex__;
+#endif
+
 static inline void phantomLog(const char* tag, bool errorOut, const char* format, ...)
 {
 	// Variable List
@@ -61,7 +66,9 @@ static inline void phantomLog(const char* tag, bool errorOut, const char* format
 	strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", timeInfo);
 	
 #ifdef _LOG_PRINT_
+	__log_mutex__.lock();
 	(errorOut ? std::cerr : std::cout) << timeBuffer << "\t" << tag << "\t" << msg << std::endl;
+	__log_mutex__.unlock();
 #endif
 
 #ifdef _LOG_FILE_
