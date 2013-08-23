@@ -39,6 +39,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sys/time.h>
 #include <time.h>
 
 #ifdef _LOG_PRINT_
@@ -58,6 +59,10 @@ static inline void phantomLog(const char* tag, bool errorOut, const char* format
 	va_end(argptr);
 	
 	// Time
+	timeval tv;
+	gettimeofday(&tv, NULL);
+        int ms = tv.tv_usec / 1000;
+
 	static char timeBuffer[21];
 	time_t rawTime;
 	struct tm* timeInfo;
@@ -67,7 +72,7 @@ static inline void phantomLog(const char* tag, bool errorOut, const char* format
 	
 #ifdef _LOG_PRINT_
 	__log_mutex__.lock();
-	(errorOut ? std::cerr : std::cout) << timeBuffer << "\t" << tag << "\t" << msg << std::endl;
+	(errorOut ? std::cerr : std::cout) << timeBuffer << "." << ms << "\t" << tag << "\t" << msg << std::endl;
 	__log_mutex__.unlock();
 #endif
 
