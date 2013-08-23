@@ -58,7 +58,7 @@ static inline void phantomLog(const char* tag, bool errorOut, const char* format
 	va_end(argptr);
 	
 	// Time
-	static char timeBuffer[19];
+	static char timeBuffer[21];
 	time_t rawTime;
 	struct tm* timeInfo;
 	time(&rawTime);
